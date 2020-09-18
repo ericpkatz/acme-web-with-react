@@ -2,6 +2,28 @@ import { combineReducers, createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import axios from 'axios';
 
+const SET_EMPLOYEE = 'SET_EMPLOYEE';
+
+const employeeReducer = (state = {}, action)=> {
+  if(action.type === SET_EMPLOYEE){
+    return action.employee;
+  }
+  return state;
+};
+
+const setEmployee = (employee)=> {
+  return {
+    type: SET_EMPLOYEE,
+    employee
+  };
+};
+
+const fetchEmployee = (id)=> {
+  return async(dispatch)=> {
+    dispatch(setEmployee((await axios.get(`/api/employees/${id}`)).data));
+  };
+};
+
 const SET_EMPLOYEES = 'SET_EMPLOYEES';
 
 const employeesReducer = (state = [], action)=> {
@@ -12,7 +34,6 @@ const employeesReducer = (state = [], action)=> {
 };
 
 const setEmployees = (employees)=> {
-  console.log(employees);
   return {
     type: SET_EMPLOYEES,
     employees
@@ -35,7 +56,6 @@ const departmentsReducer = (state = [], action)=> {
 };
 
 const setDepartments = (departments)=> {
-  console.log(departments);
   return {
     type: SET_DEPARTMENTS,
     departments
@@ -50,12 +70,13 @@ const fetchDepartments = ()=> {
 
 const reducer = combineReducers({
   departments: departmentsReducer,
-  employees: employeesReducer
+  employees: employeesReducer,
+  employee: employeeReducer
 });
 
 const store = createStore(reducer, applyMiddleware(thunk));
 
 
-export { fetchEmployees, fetchDepartments };
+export { fetchEmployees, fetchDepartments, fetchEmployee };
 
 export default store;
